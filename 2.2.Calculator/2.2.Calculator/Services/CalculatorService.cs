@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Calculator.Services
 {
-    public class CalculatorService : ICalculatorService
+    public class CalculatorService : ServiceBase<CalculatorService>, ICalculatorService
     {
-        private ICalculationEngine calculationEngine;
-        public CalculatorService(ICalculationEngine calculationEngine)
+        private readonly ICalculationEngine calculationEngine;
+        public CalculatorService(ICalculationEngine calculationEngine, ILogger<CalculatorService> logger) : base(logger)
         {
             this.calculationEngine = calculationEngine;
         }
@@ -30,10 +31,10 @@ namespace Calculator.Services
                     result = calculationEngine.Divide(a, b);
                     break;
                 default:
-
+                    string msg = $"Not supported {operation}";
+                    logger.LogError(msg);
                     throw new ArgumentOutOfRangeException(
-                        nameof(operation),
-                        $"Not supported {operation}");
+                        nameof(operation), msg);
             }
 
             return result;
